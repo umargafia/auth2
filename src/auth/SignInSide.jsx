@@ -11,8 +11,9 @@ import Grid from '@mui/material/Grid';
 import LockOutlinedIcon from '@mui/icons-material/LockOutlined';
 import Typography from '@mui/material/Typography';
 import { createTheme, ThemeProvider } from '@mui/material/styles';
-import { useState } from 'react';
 import Img from '../assets/im2.jpg';
+import { useAuth } from './useAuth';
+import { CircularProgress } from '@mui/material';
 
 function Copyright(props) {
   return (
@@ -34,39 +35,22 @@ function Copyright(props) {
 const defaultTheme = createTheme();
 
 export default function SignInSide() {
-  const [showPassword, setShowPassword] = useState(true);
-  const [login, setLogin] = useState(true);
-  const [loginData, setLoginData] = useState({
-    email: '',
-    password: '',
-  });
-
-  const [signUpData, setSignUpData] = useState({
-    name: '',
-    email: '',
-    password: '',
-  });
-
-  const handleClickShowPassword = () => {
-    setShowPassword((show) => !show);
-  };
-
-  const toggleLogin = () => {
-    setLogin((prev) => !prev);
-  };
-
-  const handleSubmit = (event) => {
-    event.preventDefault();
-    if (login) {
-      console.log(loginData);
-    } else if (!login) {
-      console.log(signUpData);
-    }
-  };
-
+  const {
+    showPassword,
+    login,
+    error,
+    loginData,
+    signUpData,
+    handleClickShowPassword,
+    toggleLogin,
+    handleSubmit,
+    handleLoginData,
+    handleSignUpData,
+    loading,
+  } = useAuth();
   return (
     <ThemeProvider theme={defaultTheme}>
-      <Grid container component="main" sx={{ height: '90vh' }}>
+      <Grid container component="main" sx={{ height: '100vh' }}>
         <CssBaseline />
         <Grid
           item
@@ -125,12 +109,7 @@ export default function SignInSide() {
                     name="email"
                     type="email"
                     value={loginData.email}
-                    onChange={(event) =>
-                      setLoginData((prev) => ({
-                        ...prev,
-                        email: event.target.value,
-                      }))
-                    }
+                    onChange={(e) => handleLoginData(e, 'email')}
                     autoComplete="email"
                     autoFocus
                   />
@@ -143,12 +122,7 @@ export default function SignInSide() {
                     type={showPassword ? 'text' : 'password'}
                     id="password"
                     value={loginData.password}
-                    onChange={(event) =>
-                      setLoginData((prev) => ({
-                        ...prev,
-                        password: event.target.value,
-                      }))
-                    }
+                    onChange={(e) => handleLoginData(e, 'password')}
                     autoComplete="current-password"
                   />
                 </>
@@ -164,12 +138,7 @@ export default function SignInSide() {
                     autoComplete="text"
                     autoFocus
                     value={signUpData.name}
-                    onChange={(event) =>
-                      setSignUpData((prev) => ({
-                        ...prev,
-                        name: event.target.value,
-                      }))
-                    }
+                    onChange={(e) => handleSignUpData(e, 'name')}
                   />
                   <TextField
                     margin="normal"
@@ -182,12 +151,7 @@ export default function SignInSide() {
                     autoComplete="email"
                     autoFocus
                     value={signUpData.email}
-                    onChange={(event) =>
-                      setSignUpData((prev) => ({
-                        ...prev,
-                        email: event.target.value,
-                      }))
-                    }
+                    onChange={(e) => handleSignUpData(e, 'email')}
                   />
                   <TextField
                     margin="normal"
@@ -199,12 +163,7 @@ export default function SignInSide() {
                     id="password"
                     autoComplete="current-password"
                     value={signUpData.password}
-                    onChange={(event) =>
-                      setSignUpData((prev) => ({
-                        ...prev,
-                        password: event.target.value,
-                      }))
-                    }
+                    onChange={(e) => handleSignUpData(e, 'password')}
                   />
                 </>
               )}
@@ -219,17 +178,35 @@ export default function SignInSide() {
                 }
                 label="Show Password"
               />
-              <Button
-                type="submit"
-                fullWidth
-                variant="contained"
-                sx={{ mt: 3, mb: 2 }}
-              >
-                {login ? 'Sign In' : 'Create Account'}
-              </Button>
+              {error && (
+                <Typography
+                  color={(theme) => theme.palette.error.main}
+                  textAlign="center"
+                >
+                  {error}
+                </Typography>
+              )}
+              {!loading ? (
+                <Button
+                  type="submit"
+                  fullWidth
+                  variant="contained"
+                  sx={{ mt: 2, mb: 2 }}
+                >
+                  {login ? 'Sign In' : 'Create Account'}
+                </Button>
+              ) : (
+                <Button fullWidth disabled variant="contained">
+                  <CircularProgress />
+                </Button>
+              )}
               <Grid
                 container
-                sx={{ display: 'flex', flexDirection: 'column' }}
+                sx={{
+                  display: 'flex',
+                  flexDirection: 'column',
+                  alignItems: 'center',
+                }}
               >
                 <Grid item xs>
                   <Link href="#" variant="body2">

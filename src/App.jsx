@@ -1,13 +1,12 @@
-import './App.css'
-import SignInSide from './auth/SignInSide'
+import { Box } from '@mui/material';
+import SignInSide from './auth/SignInSide';
 
 function App() {
-
   return (
-    <>
-     <SignInSide/> 
-    </>
-  )
+    <Box>
+      <SignInSide />
+    </Box>
+  );
 }
 
-export default App
+export default App;
