@@ -1,12 +1,14 @@
 import { useState } from 'react';
+import { useDispatch, useSelector } from 'react-redux';
+import { authActions } from '../store/authSlice';
 
 export function useAuth() {
   const Api = 'http://localhost:4000/api/v1/users/';
-
+  const { loading } = useSelector((state) => state);
   const [showPassword, setShowPassword] = useState(true);
   const [login, setLogin] = useState(true);
   const [error, setError] = useState('');
-  const [loading, setLoading] = useState(false);
+  const dispatch = useDispatch();
 
   const [loginData, setLoginData] = useState({
     email: '',
@@ -24,58 +26,74 @@ export function useAuth() {
   };
 
   const toggleLogin = () => {
+    setError('');
     setLogin((prev) => !prev);
   };
 
-  const handleSubmit = async (event) => {
-    event.preventDefault();
-    setLoading(true);
-    if (login) {
-      try {
-        const response = await fetch(`${Api}login`, {
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/json',
-          },
-          body: JSON.stringify(loginData),
-        });
-
-        const data = await response.json();
-
-        if (data.status === 'fail') {
-          setError(data.message);
-          setLoading(false);
-          return;
-        }
-        console.log(data);
-      } catch (error) {
-        console.log(error);
-      }
-    } else if (!login) {
-      try {
-        const response = await fetch(`${Api}signup`, {
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/json',
-          },
-          body: JSON.stringify({
-            ...signUpData,
-            passwordConfirm: signUpData.password,
-          }),
-        });
-
-        const data = await response.json();
-
-        if (data.status === 'fail' || data.status === 'error') {
-          setError(data.message);
-          setLoading(false);
-          return;
-        }
-        console.log(data);
-      } catch (error) {
-        console.log(error.message);
-      }
+  const loginHandler = async () => {
+    if (
+      loginData.email.trim() === '' ||
+      loginData.password.trim() === ''
+    ) {
+      setError('Please provide email and password!');
+      return;
     }
+    try {
+      const response = await fetch(`${Api}login`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(loginData),
+      });
+
+      const data = await response.json();
+
+      if (data.status === 'fail') {
+        setError(data.message);
+        return;
+      }
+      dispatch(authActions.loginUser(data));
+    } catch (error) {
+      console.log(error);
+    }
+  };
+
+  const signupHandler = async () => {
+    if (
+      signUpData.email.trim() === '' ||
+      signUpData.password.trim() === '' ||
+      signUpData.name.trim() === ''
+    ) {
+      setError('Please make sure you provide all fields!');
+      return;
+    }
+
+    try {
+      const response = await fetch(`${Api}signup`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          ...signUpData,
+          passwordConfirm: signUpData.password,
+        }),
+      });
+
+      const data = await response.json();
+
+      if (data.status === 'fail' || data.status === 'error') {
+        setError(data.message);
+        return;
+      }
+      dispatch(authActions.loginUser(data));
+    } catch (error) {
+      console.log(error.message);
+    }
+  };
+
+  const clearFields = () => {
     setLoginData({
       email: '',
       password: '',
@@ -85,12 +103,22 @@ export function useAuth() {
       email: '',
       password: '',
     });
-    setLoading(false);
+    dispatch(authActions.toggleLoading());
+  };
+
+  const handleSubmit = async (event) => {
+    event.preventDefault();
+    dispatch(authActions.toggleLoading());
+    if (login) {
+      loginHandler();
+    } else if (!login) {
+      signupHandler();
+    }
+    clearFields();
   };
 
   const handleLoginData = (e, value) => {
     setError('');
-    setLoading(false);
     setLoginData((prev) => ({
       ...prev,
       [value]: e.target.value,
@@ -99,7 +127,6 @@ export function useAuth() {
 
   const handleSignUpData = (e, value) => {
     setError('');
-    setLoading(false);
     setSignUpData((prev) => ({
       ...prev,
       [value]: e.target.value,
