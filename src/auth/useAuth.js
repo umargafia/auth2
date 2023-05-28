@@ -1,10 +1,10 @@
 import { useState } from 'react';
-import { useDispatch, useSelector } from 'react-redux';
+import { useDispatch } from 'react-redux';
 import { authActions } from '../store/authSlice';
 
 export function useAuth() {
   const Api = 'http://localhost:4000/api/v1/users/';
-  const { loading } = useSelector((state) => state);
+  const [loading, setLoading] = useState(false);
   const [showPassword, setShowPassword] = useState(true);
   const [login, setLogin] = useState(true);
   const [error, setError] = useState('');
@@ -38,6 +38,7 @@ export function useAuth() {
       setError('Please provide email and password!');
       return;
     }
+    setLoading(true);
     try {
       const response = await fetch(`${Api}login`, {
         method: 'POST',
@@ -51,11 +52,14 @@ export function useAuth() {
 
       if (data.status === 'fail') {
         setError(data.message);
+        setLoading(false);
         return;
       }
       dispatch(authActions.loginUser(data));
+      setLoading(false);
     } catch (error) {
       console.log(error);
+      setLoading(false);
     }
   };
 
@@ -68,6 +72,7 @@ export function useAuth() {
       setError('Please make sure you provide all fields!');
       return;
     }
+    setLoading(true);
 
     try {
       const response = await fetch(`${Api}signup`, {
@@ -85,11 +90,14 @@ export function useAuth() {
 
       if (data.status === 'fail' || data.status === 'error') {
         setError(data.message);
+        setLoading(false);
         return;
       }
       dispatch(authActions.loginUser(data));
+      setLoading(false);
     } catch (error) {
       console.log(error.message);
+      setLoading(false);
     }
   };
 
@@ -103,12 +111,10 @@ export function useAuth() {
       email: '',
       password: '',
     });
-    dispatch(authActions.toggleLoading());
   };
 
   const handleSubmit = async (event) => {
     event.preventDefault();
-    dispatch(authActions.toggleLoading());
     if (login) {
       loginHandler();
     } else if (!login) {
