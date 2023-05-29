@@ -5,7 +5,7 @@ import { authActions } from '../store/authSlice';
 export function useAuth() {
   const Api = 'http://localhost:4000/api/v1/users/';
   const [loading, setLoading] = useState(false);
-  const [showPassword, setShowPassword] = useState(true);
+  const [showPassword, setShowPassword] = useState(false);
   const [login, setLogin] = useState(true);
   const [error, setError] = useState('');
   const dispatch = useDispatch();

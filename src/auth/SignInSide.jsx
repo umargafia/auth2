@@ -11,9 +11,9 @@ import Grid from '@mui/material/Grid';
 import LockOutlinedIcon from '@mui/icons-material/LockOutlined';
 import Typography from '@mui/material/Typography';
 import { createTheme, ThemeProvider } from '@mui/material/styles';
-import Img from '../assets/im2.jpg';
+// import Img from '../assets/im2.jpg';
 import { useAuth } from './useAuth';
-import { CircularProgress } from '@mui/material';
+import { Card, CircularProgress } from '@mui/material';
 
 function Copyright(props) {
   return (
@@ -24,15 +24,15 @@ function Copyright(props) {
       {...props}
     >
       {'Copyright © '}
-      <Link color="inherit" href="https://mui.com/">
-        Ugafia
+      <Link color="inherit" href="#">
+        Abubakar
       </Link>
       {new Date().getFullYear()}
     </Typography>
   );
 }
 
-const defaultTheme = createTheme();
+const defaultTheme = createTheme({});
 
 export default function SignInSide() {
   const {
@@ -52,38 +52,17 @@ export default function SignInSide() {
     <ThemeProvider theme={defaultTheme}>
       <Grid container component="main" sx={{ height: '100vh' }}>
         <CssBaseline />
-        <Grid
-          item
-          xs={false}
-          sm={4}
-          md={7}
-          sx={{
-            backgroundImage: `url(${Img})`,
-            backgroundRepeat: 'no-repeat',
-            backgroundColor: (t) =>
-              t.palette.mode === 'light'
-                ? t.palette.grey[50]
-                : t.palette.grey[900],
-            backgroundSize: 'cover',
-            backgroundPosition: 'center',
-          }}
-        />
-        <Grid
-          item
-          xs={12}
-          sm={8}
-          md={5}
-          component={Paper}
-          elevation={6}
-          square
-        >
-          <Box
+
+        <Grid item xs={12} component={Paper} elevation={6} square>
+          <Card
             sx={{
               my: 8,
               mx: 4,
               display: 'flex',
               flexDirection: 'column',
               alignItems: 'center',
+              background: '#eee',
+              padding: 10,
             }}
           >
             <Avatar sx={{ m: 1, bgcolor: 'secondary.main' }}>
@@ -101,6 +80,7 @@ export default function SignInSide() {
               {login ? (
                 <>
                   <TextField
+                    variant="standard"
                     margin="normal"
                     required
                     fullWidth
@@ -114,6 +94,7 @@ export default function SignInSide() {
                     autoFocus
                   />
                   <TextField
+                    variant="standard"
                     margin="normal"
                     required
                     fullWidth
@@ -129,6 +110,7 @@ export default function SignInSide() {
               ) : (
                 <>
                   <TextField
+                    variant="standard"
                     margin="normal"
                     required
                     fullWidth
@@ -141,6 +123,7 @@ export default function SignInSide() {
                     onChange={(e) => handleSignUpData(e, 'name')}
                   />
                   <TextField
+                    variant="standard"
                     margin="normal"
                     required
                     fullWidth
@@ -154,6 +137,7 @@ export default function SignInSide() {
                     onChange={(e) => handleSignUpData(e, 'email')}
                   />
                   <TextField
+                    variant="standard"
                     margin="normal"
                     required
                     fullWidth
@@ -208,11 +192,13 @@ export default function SignInSide() {
                   alignItems: 'center',
                 }}
               >
-                <Grid item xs>
-                  <Link href="#" variant="body2">
-                    Forgot password?
-                  </Link>
-                </Grid>
+                {login && (
+                  <Grid item xs>
+                    <Link href="#" variant="body2">
+                      Forgot password?
+                    </Link>
+                  </Grid>
+                )}
                 <Grid item>
                   <Link
                     href="#"
@@ -227,7 +213,7 @@ export default function SignInSide() {
               </Grid>
               <Copyright sx={{ mt: 5 }} />
             </Box>
-          </Box>
+          </Card>
         </Grid>
       </Grid>
     </ThemeProvider>
